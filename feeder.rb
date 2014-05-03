@@ -28,7 +28,7 @@ MAX_TERMS = ENV["MAX_TERMS"] || nil
 if MAX_TERMS
   TERMS = EmojiData.chars.first(MAX_TERMS.to_i)
 else
-  TERMS = EmojiData.chars
+  TERMS = EmojiData.chars({include_variants: true})
 end
 
 #track references to us too
