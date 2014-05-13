@@ -29,10 +29,10 @@ module WrappedTweet
     links = []
     (self.urls + self.media).each do |link|
       links << {
-        'url' => link.url.to_s,
-        'display_url' => link.display_url.to_s,
+        'url'          => link.url.to_s,
+        'display_url'  => link.display_url.to_s,
         'expanded_url' => link.expanded_url.to_s,
-        'indices' => link.indices
+        'indices'      => link.indices
       }
     end
 
