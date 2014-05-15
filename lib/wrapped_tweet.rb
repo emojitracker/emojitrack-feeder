@@ -53,8 +53,9 @@ module WrappedTweet
   end
 
   # return all the emoji chars contained in the tweet, as EmojiData::EmojiChar objects
+  # dedupe since we only want to count each emoji once per tweet
   def emojis
-    @emojis ||= EmojiData.find_by_str(self.text)
+    @emojis ||= EmojiData.find_by_str(self.text).uniq { |e| e.unified }
   end
 
   protected
