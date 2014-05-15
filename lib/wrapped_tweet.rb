@@ -18,7 +18,7 @@ module WrappedTweet
       'screen_name'         => self.user.screen_name,
       'name'                => self.safe_user_name(),
       'links'               => self.ensmallen_links(),
-      'profile_image_url'   => self.user.profile_image_url,
+      'profile_image_url'   => self.user.profile_image_url.to_s,
       'created_at'          => self.created_at.iso8601
     }
   end
@@ -28,7 +28,12 @@ module WrappedTweet
   def ensmallen_links
     links = []
     (self.urls + self.media).each do |link|
-      links << {'url' => link.url, 'display_url' => link.display_url, 'expanded_url' => link.expanded_url, 'indices' => link.indices}
+      links << {
+        'url'          => link.url.to_s,
+        'display_url'  => link.display_url.to_s,
+        'expanded_url' => link.expanded_url.to_s,
+        'indices'      => link.indices
+      }
     end
 
     #always sort results, so clients can easily reverse to loop and s//
@@ -41,6 +46,8 @@ module WrappedTweet
   end
 
   # return all the emoji chars contained in the tweet
+  # TODO: deprecate and remove me, dont appear to be using anywhere and  will
+  # probably having unexpected behavior with the variant encoding change.
   def emoji_chars
     @emoji_chars ||= self.emojis.map { |e| e.char }
   end

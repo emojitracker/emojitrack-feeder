@@ -11,10 +11,10 @@ module KioskInteraction
 
   # configure twitter instance
   KIOSK_TWITTER_CLIENT = Twitter::Client.new(
-    :consumer_key       => ENV['KIOSK_CONSUMER_KEY'],
-    :consumer_secret    => ENV['KIOSK_CONSUMER_SECRET'],
-    :oauth_token        => ENV['KIOSK_OAUTH_TOKEN'],
-    :oauth_token_secret => ENV['KIOSK_OAUTH_TOKEN_SECRET']
+    :consumer_key        => ENV['KIOSK_CONSUMER_KEY'],
+    :consumer_secret     => ENV['KIOSK_CONSUMER_SECRET'],
+    :access_token        => ENV['KIOSK_OAUTH_TOKEN'],
+    :access_token_secret => ENV['KIOSK_OAUTH_TOKEN_SECRET']
   )
 
   def self.enabled?
