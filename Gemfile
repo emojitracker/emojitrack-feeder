@@ -13,7 +13,7 @@ end
 
 group :feeder do
   gem 'tweetstream', '~> 2.6.1'
-  gem 'twitter', '~> 5.5' #manually set same as tweetstream
+  gem 'twitter', '5.8.0' #manually set!
   gem 'colored', '~> 1.2'
 end
 
