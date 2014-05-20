@@ -49,6 +49,10 @@ EM.run do
     @skipped = skip_count
     puts "RATE LIMITED LOL"
   end
+  @client.on_stall_warning do |warning|
+    puts "STALL FALLBEHIND WARNING - NOT KEEPING UP WITH STREAM"
+    puts warning
+  end
   @client.track(TERMS) do |status|
     @tracked += 1
 
