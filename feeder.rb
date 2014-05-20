@@ -47,7 +47,7 @@ EM.run do
   end
   @client.on_limit do |skip_count|
     @skipped = skip_count
-    # puts "RATE LIMITED LOL"
+    puts "RATE LIMITED LOL"
   end
   @client.track(TERMS) do |status|
     @tracked += 1
