@@ -40,7 +40,7 @@ GEM
     multipart-post (2.0.0)
     naught (1.0.0)
     newrelic_rpm (3.8.0.218)
-    oj (2.9.3)
+    oj (2.9.5)
     redis (3.0.7)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
