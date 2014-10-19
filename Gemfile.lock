@@ -42,7 +42,7 @@ GEM
     multipart-post (2.0.0)
     naught (1.0.0)
     newrelic_rpm (3.9.5.251)
-    oj (2.9.5)
+    oj (2.9.9)
     redis (3.0.7)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
@@ -82,7 +82,7 @@ DEPENDENCIES
   foreman (~> 0.75.0)
   hiredis (~> 0.5.2)
   newrelic_rpm
-  oj (~> 2.9.3)
+  oj (~> 2.9.9)
   redis (~> 3.0.7)
   rspec (~> 2.14.1)
   tweetstream (~> 2.6.1)
