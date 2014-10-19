@@ -14,7 +14,10 @@ puts "...starting in verbose mode!" if VERBOSE
 $stdout.sync = true
 
 # in production, load newrelic
-require 'newrelic_rpm' if is_production?
+if is_production?
+  require 'newrelic_rpm'
+  GC::Profiler.enable
+end
 
 # check for development mode with remote redis server, if so refuse to run
 if (REDIS_URI.to_s.match(/redis(?:togo|cloud)/) && !is_production?)
