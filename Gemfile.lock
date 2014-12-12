@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.6)
+    benchmark-ips (2.1.0)
     buftok (0.2.0)
     colored (1.2)
     cookiejar (0.3.2)
@@ -74,6 +75,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  benchmark-ips (~> 2.1.0)
   colored (~> 1.2)
   emoji_data (~> 0.2.0)
   hiredis (~> 0.5.2)
