@@ -1,8 +1,8 @@
 # emojitrack-feeder
-This consumes the Twitter streaming API, processing and feeding the Redis instance for the rest of emojitracker.
+This consumes the Twitter streaming API, processing and feeding the Redis instance for the rest of Emojitracker.
 
 ## Development Setup
- 1. Make sure you have Ruby 2.0.0 installed (preferably managed with RVM or rbenv so that the `.ruby-version` for this repository will be picked up).
+ 1. Make sure you have Ruby 2.1.x installed.
  2. Get the repository and basic dependencies going:
 
         git clone mroth/emojitrack-feeder
