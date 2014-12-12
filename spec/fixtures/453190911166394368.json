@@ -1,0 +1,106 @@
+{
+    "created_at": "Mon Apr 07 15:21:47 +0000 2014",
+    "id": 453190911166394368, 
+    "id_str": "453190911166394368",
+    "text": "Still can’t work out what angle Mike Judge is trying for with “Silicon Valley”. The result was sad, overly-stereotyped and very dull.",
+    "source": "<a href=\"http://tapbots.com/tweetbot\" rel=\"nofollow\">Tweetbot for iOS</a>",
+    "truncated": false,
+    "in_reply_to_status_id": null,
+    "in_reply_to_status_id_str": null,
+    "in_reply_to_user_id": null,
+    "in_reply_to_user_id_str": null,
+    "in_reply_to_screen_name": null,
+    "user": {
+        "id": 8877,
+        "id_str": "8877",
+        "name": "Simon Batistoni",
+        "screen_name": "hitherto",
+        "location": "San Francisco, CA, USA",
+        "description": "British, Californian, Sellout, Feminist, Eater, Cyclist, Haver of Opinions, Snowboarder, Partier, Lover, Fighter, Friend. I swear a lot, deal with it.",
+        "url": null,
+        "entities": {
+            "description": {
+                "urls": []
+            }
+        },
+        "protected": false,
+        "followers_count": 639,
+        "friends_count": 283,
+        "listed_count": 65,
+        "created_at": "Fri Oct 13 18:52:52 +0000 2006",
+        "favourites_count": 602,
+        "utc_offset": -25200,
+        "time_zone": "Pacific Time (US & Canada)",
+        "geo_enabled": true,
+        "verified": false,
+        "statuses_count": 3757,
+        "lang": "en",
+        "contributors_enabled": false,
+        "is_translator": false,
+        "is_translation_enabled": false,
+        "profile_background_color": "FFFFFF",
+        "profile_background_image_url": "http://pbs.twimg.com/profile_background_images/413182010/2193942141_89e6932647_o.jpg",
+        "profile_background_image_url_https": "https://pbs.twimg.com/profile_background_images/413182010/2193942141_89e6932647_o.jpg",
+        "profile_background_tile": false,
+        "profile_image_url": "http://pbs.twimg.com/profile_images/378800000507641425/df2491c3f315a5ad3b353e999098bbe3_normal.jpeg",
+        "profile_image_url_https": "https://pbs.twimg.com/profile_images/378800000507641425/df2491c3f315a5ad3b353e999098bbe3_normal.jpeg",
+        "profile_link_color": "00009E",
+        "profile_sidebar_border_color": "87BC44",
+        "profile_sidebar_fill_color": "E0FF92",
+        "profile_text_color": "000000",
+        "profile_use_background_image": true,
+        "default_profile": false,
+        "default_profile_image": false,
+        "following": true,
+        "follow_request_sent": false,
+        "notifications": false
+    },
+    "geo": null,
+    "coordinates": null,
+    "place": {
+        "id": "9cee92fec370baf9",
+        "url": "https://api.twitter.com/1.1/geo/id/9cee92fec370baf9.json",
+        "place_type": "city",
+        "name": "Burlingame",
+        "full_name": "Burlingame, CA",
+        "country_code": "US",
+        "country": "United States",
+        "contained_within": [],
+        "bounding_box": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [
+                        -122.4039361,
+                        37.5681114
+                    ],
+                    [
+                        -122.330802,
+                        37.5681114
+                    ],
+                    [
+                        -122.330802,
+                        37.604114
+                    ],
+                    [
+                        -122.4039361,
+                        37.604114
+                    ]
+                ]
+            ]
+        },
+        "attributes": {}
+    },
+    "contributors": null,
+    "retweet_count": 0,
+    "favorite_count": 1,
+    "entities": {
+        "hashtags": [],
+        "symbols": [],
+        "urls": [],
+        "user_mentions": []
+    },
+    "favorited": false,
+    "retweeted": false,
+    "lang": "en"
+}
