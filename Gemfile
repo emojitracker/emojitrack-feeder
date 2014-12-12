@@ -18,7 +18,6 @@ group :feeder do
 end
 
 group :development do
-  gem 'foreman', '~> 0.75.0'
   gem 'rspec', '~> 2.14.1'
 end
 
