@@ -18,7 +18,7 @@ group :feeder do
 end
 
 group :development do
-  gem 'rspec', '~> 2.14.1'
+  gem 'rspec', '~> 3.1.0'
 end
 
 group :production do
