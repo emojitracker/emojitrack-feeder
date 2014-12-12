@@ -1,7 +1,7 @@
 ################################################
 # tweet object mixin
 #
-# handles common methods for dealing with tweet status we get back from tweetstream
+# handles common methods for dealing with tweet status we get from tweetstream
 ################################################
 require 'emoji_data'
 require 'oj'
@@ -9,7 +9,7 @@ require 'time'
 
 module WrappedTweet
 
-  # return a hash of the tweet with absolutely everything we dont to broadcast need ripped out
+  # return a hash for tweet with absolutely everything we dont need ripped out
   # (what? it's a perfectly cromulent word.)
   def ensmallen
     {
@@ -23,7 +23,7 @@ module WrappedTweet
     }
   end
 
-  # combine URL and Media entities, and return only minimum we need
+  # combines the Twitter URL and Media entities, and return only minimum we need
   # this means we pass none of the media object junk beyond the url stuff
   def ensmallen_links
     links = []
@@ -52,14 +52,14 @@ module WrappedTweet
     @emoji_chars ||= self.emojis.map { |e| e.char }
   end
 
-  # return all the emoji chars contained in the tweet, as EmojiData::EmojiChar objects
+  # return all the emoji chars contained in the tweet, as EmojiData::EmojiChar
   # dedupe since we only want to count each emoji once per tweet
   def emojis
     @emojis ||= EmojiData.find_by_str(self.text).uniq { |e| e.unified }
   end
 
   protected
-  # twitter seems to have a bug where user names can get null bytes set in their string
+  # twitter seems to have a bug where usernames can get null bytes set in string
   # this strips them out so we dont cause string parse errors
   def safe_user_name
     @safe_name ||= self.user.name.gsub(/\0/, '')
