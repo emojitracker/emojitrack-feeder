@@ -26,9 +26,8 @@ module WrappedTweet
   # combines the Twitter URL and Media entities, and return only minimum we need
   # this means we pass none of the media object junk beyond the url stuff
   def ensmallen_links
-    links = []
-    (self.urls + self.media).each do |link|
-      links << {
+    links = (self.urls + self.media).map do |link|
+      {
         'url'          => link.url.to_s,
         'display_url'  => link.display_url.to_s,
         'expanded_url' => link.expanded_url.to_s,
