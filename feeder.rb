@@ -45,6 +45,9 @@ if is_development? && PROFILE
 end
 
 EventMachine.run do
+  # load Lua scripts to Redis server
+  # save the SHA so we can refer to them later in EVALSHA
+  sha = REDIS.script(:load, IO.read("./scripts/update.lua"))
 
   puts "Setting up a stream to track #{TERMS.size} terms '#{TERMS}'..."
   @tracked,@skipped,@tracked_last,@skipped_last = 0,0,0,0
@@ -86,20 +89,7 @@ EventMachine.run do
     # update redis for each matched char
     status.emojis.each do |matched_emoji|
       cp = matched_emoji.unified
-      REDIS.pipelined do
-        # increment the score in a sorted set
-        REDIS.ZINCRBY 'emojitrack_score', 1, cp
-
-        # stream the fact that the score was updated
-        REDIS.PUBLISH 'stream.score_updates', cp
-
-        # for each emoji char, store the most recent 10 tweets in a list
-        REDIS.LPUSH "emojitrack_tweets_#{cp}", status.tiny_json
-        REDIS.LTRIM "emojitrack_tweets_#{cp}",0,9
-
-        # also stream all tweet updates to named streams by char
-        REDIS.PUBLISH "stream.tweet_updates.#{cp}", status.tiny_json
-      end
+      REDIS.evalsha(sha, [], [cp, status.tiny_json])
     end
   end
 
