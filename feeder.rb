@@ -8,8 +8,8 @@ require 'oj'
 require 'colored'
 require 'eventmachine'
 
-# my options
 
+# my options
 puts "...starting in verbose mode!" if VERBOSE
 $stdout.sync = true
 
@@ -37,7 +37,15 @@ end
 #track references to us too
 TERMS << '@emojitracker'
 
-EM.run do
+# if we are actively profiling for performance, load and start the profiler
+if is_development? && PROFILE
+  puts "Starting profiling run, profile will be logged upon termination."
+  require 'stackprof'
+  StackProf.start()
+end
+
+EventMachine.run do
+
   puts "Setting up a stream to track #{TERMS.size} terms '#{TERMS}'..."
   @tracked,@skipped,@tracked_last,@skipped_last = 0,0,0,0
 
@@ -113,5 +121,20 @@ EM.run do
     puts "REDIS - used memory: #{info['used_memory_human']}, iops: #{info['instantaneous_ops_per_sec']}"
     graphite_log('feeder.redis.used_memory_kb', info['used_memory'].to_i / 1024)
     graphite_log('feeder.redis.iops', info['instantaneous_ops_per_sec'])
+  end
+
+  # Trap TERM signals sent to PID, for anything we want to do upon shutdown.
+  #
+  # For now, this is just used to stop the profiler if running, but could be
+  # for anything clever to make things more graceful ala:
+  # http://robares.com/2010/09/26/safe-shutdown-of-eventmachine-reactors/
+  trap("TERM") do
+    if is_development? && PROFILE
+      StackProf.stop()
+      File.open('stackprof-feeder-cpu.dump', 'wb') do |f|
+        f.write Marshal.dump(StackProf.results)
+      end
+    end
+    EM.stop
   end
 end

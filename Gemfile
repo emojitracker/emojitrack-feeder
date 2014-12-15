@@ -20,6 +20,7 @@ end
 group :development do
   gem 'rspec', '~> 3.1.0'
   gem 'benchmark-ips', '~> 2.1.0'
+  gem 'stackprof'
 end
 
 group :production do

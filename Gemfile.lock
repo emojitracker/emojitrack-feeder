@@ -52,6 +52,7 @@ GEM
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
     simple_oauth (0.2.0)
+    stackprof (0.2.7)
     thread_safe (0.3.3)
     tweetstream (2.6.1)
       daemons (~> 1.1)
@@ -83,5 +84,6 @@ DEPENDENCIES
   oj (~> 2.9.9)
   redis (~> 3.0.7)
   rspec (~> 3.1.0)
+  stackprof
   tweetstream (~> 2.6.1)
   twitter (= 5.8.0)
