@@ -11,6 +11,9 @@ end
 # verbose mode or no
 VERBOSE = to_boolean(ENV["VERBOSE"]) || false
 
+# profile mode or no
+PROFILE = to_boolean(ENV["PROFILE"]) || false
+
 # configure tweetstream instance
 TweetStream.configure do |config|
   config.consumer_key       = ENV['CONSUMER_KEY']
