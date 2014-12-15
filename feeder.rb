@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-
 require_relative 'lib/config'
 require_relative 'lib/wrapped_tweet'
 require_relative 'lib/kiosk_interaction'
@@ -8,25 +7,33 @@ require 'oj'
 require 'colored'
 require 'eventmachine'
 
-
-# my options
+# preamble
 puts "...starting in verbose mode!" if VERBOSE
 $stdout.sync = true
 
-# in production, load newrelic
+# NewRelic for server monitoring in production
 if is_production?
   require 'newrelic_rpm'
   GC::Profiler.enable
 end
 
-# check for development mode with remote redis server, if so refuse to run
+# SAFETY CHECK
+# check for development mode with remote production redis server,
+# if so refuse to run to avoid data corruption.
 if (REDIS_URI.to_s.match(/redis(?:togo|cloud)/) && !is_production?)
-  Kernel::abort "You shouldn't be using the production redis server with a local version of feeder! Quitting..."
+  puts  "Don't use the production redis server with a local version of feeder!"
+  abort "Quitting..."
 end
 
-# SETUP
-# 400 terms is the max twitter will allow with a normal dev account
-# set that if you are on a normal key otherwise the stream will not return anything to you
+# SETUP TERMS
+# Grabbed from our EmojiData gem.
+# Allow for a MAX_TERMS override from environment variable.
+#
+# Note to devs: if you request more terms than your account is flagged for, then
+# Twitter will silently fail without an error but send you zero data, looking
+# like nothing matched. 400 terms is the default max for a dev account with
+# streaming API access, so set this if you are not on our special production
+# keys with elevated access.
 MAX_TERMS = ENV["MAX_TERMS"] || nil
 if MAX_TERMS
   TERMS = EmojiData.chars.first(MAX_TERMS.to_i)
@@ -34,8 +41,8 @@ else
   TERMS = EmojiData.chars({include_variants: true})
 end
 
-#track references to us too
-TERMS << '@emojitracker'
+#track references to us too (in kiosk mode)
+TERMS << '@emojitracker' if KioskInteraction.enabled?
 
 # if we are actively profiling for performance, load and start the profiler
 if is_development? && PROFILE
@@ -45,14 +52,46 @@ if is_development? && PROFILE
 end
 
 EventMachine.run do
-  # load Lua scripts to Redis server
-  # save the SHA so we can refer to them later in EVALSHA
+  # load scripts to Redis server
+  # We push most of the logic of updating Redis into a Lua script.
+  # For details of the why see the script itself.
+  #
+  # Don't forget to save the SHA so we can refer to them later via EVALSHA.
   sha = REDIS.script(:load, IO.read("./scripts/update.lua"))
 
+  # initialize streaming counts
   puts "Setting up a stream to track #{TERMS.size} terms '#{TERMS}'..."
   @tracked,@skipped,@tracked_last,@skipped_last = 0,0,0,0
-
   @client = TweetStream::Client.new
+
+  # main event loops for matched tweets
+  @client.track(TERMS) do |status|
+    @tracked += 1
+
+    # extend the tweet object with our convenience mixins
+    status.extend(WrappedTweet)
+
+    # disregard retweets
+    next if status.retweet?
+
+    # for interactive kiosk mode at #emojishow !
+    # allow users to request a specific character for display
+    # send the interaction notice but DONT LOG THE TWEET since its artificial
+    if KioskInteraction.enabled?
+      if status.text.start_with?("@emojitracker")
+        KioskInteraction::InteractionRequest.new(status).handle() if status.emojis.length > 0
+        next # halt further tweet processing
+      end
+    end
+
+    # update redis for each matched char
+    status.emojis.each do |matched_emoji|
+      cp = matched_emoji.unified
+      REDIS.evalsha(sha, [], [cp, status.tiny_json])
+    end
+  end
+
+  # Error handling for Twitter streams.
   @client.on_error do |message|
     puts "ERROR: #{message}"
   end
@@ -67,48 +106,27 @@ EventMachine.run do
     puts "STALL FALLBEHIND WARNING - NOT KEEPING UP WITH STREAM"
     puts warning
   end
-  @client.track(TERMS) do |status|
-    @tracked += 1
 
-    # extend the tweet object with our convenience mixins
-    status.extend(WrappedTweet)
-
-    # disregard retweets
-    next if status.retweet?
-
-    # for interactive kiosk mode at #emojishow, allow users to request a specific character for display
-    # send the interaction notice but DONT LOG THE TWEET since its artificial
-    if KioskInteraction.enabled?
-      is_interaction = status.text.start_with?("@emojitracker")
-      if is_interaction
-        KioskInteraction::InteractionRequest.new(status).handle() if status.emojis.length > 0
-        next # halt further tweet processing
-      end
-    end
-
-    # update redis for each matched char
-    status.emojis.each do |matched_emoji|
-      cp = matched_emoji.unified
-      REDIS.evalsha(sha, [], [cp, status.tiny_json])
-    end
-  end
-
+  # Periodic logging to console/graphite - stream track status.
   @stats_refresh_rate = 10
   EM::PeriodicTimer.new(@stats_refresh_rate) do
-    tracked_period = @tracked-@tracked_last
-    tracked_period_rate = tracked_period / @stats_refresh_rate
+    period = @tracked-@tracked_last
+    period_rate = period / @stats_refresh_rate
 
-    puts "Terms tracked: #{@tracked} (\u2191#{tracked_period}, +#{tracked_period_rate}/sec.), rate limited: #{@skipped} (+#{@skipped-@skipped_last})"
-    graphite_log('feeder.updates.rate_per_second', tracked_period_rate)
-
+    puts "Terms tracked: #{@tracked} (\u2191#{period}" +
+         ", +#{period_rate}/sec.), rate limited: #{@skipped}" +
+         " (+#{@skipped - @skipped_last})"
+    graphite_log('feeder.updates.rate_per_second', period_rate)
     @tracked_last = @tracked
     @skipped_last = @skipped
   end
 
+  # Periodic logging to console/graphite - redis DB status.
   @redis_check_refresh_rate = 60
   EM::PeriodicTimer.new(@redis_check_refresh_rate) do
     info = REDIS.info
-    puts "REDIS - used memory: #{info['used_memory_human']}, iops: #{info['instantaneous_ops_per_sec']}"
+    puts "REDIS - used memory: #{info['used_memory_human']}" +
+         ", iops: #{info['instantaneous_ops_per_sec']}"
     graphite_log('feeder.redis.used_memory_kb', info['used_memory'].to_i / 1024)
     graphite_log('feeder.redis.iops', info['instantaneous_ops_per_sec'])
   end
@@ -127,4 +145,5 @@ EventMachine.run do
     end
     EM.stop
   end
+
 end
