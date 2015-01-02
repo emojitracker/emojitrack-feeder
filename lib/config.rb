@@ -1,5 +1,4 @@
 require 'tweetstream'
-require 'redis'
 require 'uri'
 require 'socket'
 
@@ -25,12 +24,6 @@ end
 
 # db setup
 REDIS_URI = URI.parse(ENV["REDIS_URL"] || ENV["REDISCLOUD_URL"] || ENV["REDISTOGO_URL"] || ENV["BOXEN_REDIS_URL"] || "redis://localhost:6379")
-REDIS = Redis.new(
-  :host     => REDIS_URI.host,
-  :port     => REDIS_URI.port,
-  :password => REDIS_URI.password,
-  :driver   => :hiredis
-)
 
 # environment checks
 def is_production?

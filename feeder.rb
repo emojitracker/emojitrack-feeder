@@ -4,7 +4,7 @@ require_relative 'lib/wrapped_tweet'
 require 'emoji_data'
 require 'oj'
 require 'colored'
-require 'eventmachine'
+require 'em-hiredis'
 
 # preamble
 puts "...starting in verbose mode!" if VERBOSE
@@ -47,13 +47,15 @@ if is_development? && PROFILE
   StackProf.start()
 end
 
-EventMachine.run do
+EM.run do
+  db = EM::Hiredis.connect(REDIS_URI.to_s)
+
   # load scripts to Redis server
   # We push most of the logic of updating Redis into a Lua script.
   # For details of the why see the script itself.
   #
   # Don't forget to save the SHA so we can refer to them later via EVALSHA.
-  sha = REDIS.script(:load, IO.read("./scripts/update.lua"))
+  sha = db.script(:load, IO.read("./scripts/update.lua"))
 
   # initialize streaming counts
   puts "Setting up a stream to track #{TERMS.size} terms '#{TERMS}'..."
@@ -73,7 +75,7 @@ EventMachine.run do
     # update redis for each matched char
     status.emojis().each do |matched_emoji|
       cp = matched_emoji.unified
-      REDIS.evalsha(sha, [], [cp, status.tiny_json()])
+      db.evalsha(sha, [], [cp, status.tiny_json()])
     end
   end
 
@@ -110,11 +112,12 @@ EventMachine.run do
   # Periodic logging to console/graphite - redis DB status.
   @redis_check_refresh_rate = 60
   EM::PeriodicTimer.new(@redis_check_refresh_rate) do
-    info = REDIS.info
-    puts "REDIS - used memory: #{info['used_memory_human']}" +
-         ", iops: #{info['instantaneous_ops_per_sec']}"
-    graphite_log('feeder.redis.used_memory_kb', info['used_memory'].to_i / 1024)
-    graphite_log('feeder.redis.iops', info['instantaneous_ops_per_sec'])
+    db.info do |info|
+      puts "REDIS - used memory: #{info[:used_memory_human]}" +
+           ", iops: #{info[:instantaneous_ops_per_sec]}"
+      graphite_log('feeder.redis.used_memory_kb', info[:used_memory].to_i / 1024)
+      graphite_log('feeder.redis.iops', info[:instantaneous_ops_per_sec])
+    end
   end
 
   # Trap TERM signals sent to PID, for anything we want to do upon shutdown.
