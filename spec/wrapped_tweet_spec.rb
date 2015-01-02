@@ -56,10 +56,10 @@ describe WrappedTweet do
     it "results hash contains the proper url for the user profile image"
 
     it "results hash has a properly formatted iso8601 timestamp" do
-      expect(@tweet_0xurl_0xmedia.ensmallen['created_at']).to eq('2014-04-07T11:21:47-04:00')
-      expect(@tweet_1xurl_0xmedia.ensmallen['created_at']).to eq('2014-04-05T22:26:14-04:00')
-      expect(@tweet_1xurl_1xmedia.ensmallen['created_at']).to eq('2014-11-28T20:25:26-05:00')
-      expect(@tweet_3xurl_2xmedia.ensmallen['created_at']).to eq('2014-12-12T16:40:17-05:00')
+      expect(@tweet_0xurl_0xmedia.ensmallen['created_at']).to eq('2014-04-07T15:21:47+00:00')
+      expect(@tweet_1xurl_0xmedia.ensmallen['created_at']).to eq('2014-04-06T02:26:14+00:00')
+      expect(@tweet_1xurl_1xmedia.ensmallen['created_at']).to eq('2014-11-29T01:25:26+00:00')
+      expect(@tweet_3xurl_2xmedia.ensmallen['created_at']).to eq('2014-12-12T21:40:17+00:00')
     end
 
   end
