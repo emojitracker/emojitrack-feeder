@@ -55,7 +55,10 @@ EM.run do
   # For details of the why see the script itself.
   #
   # Don't forget to save the SHA so we can refer to them later via EVALSHA.
-  sha = db.script(:load, IO.read("./scripts/update.lua"))
+  # sha = db.script(:load, IO.read("./scripts/update.lua"))
+
+  # hiredis method loads all scripts and binds them to a method with same name
+  EM::Hiredis::Client.load_scripts_from('./scripts')
 
   # initialize streaming counts
   puts "Setting up a stream to track #{TERMS.size} terms '#{TERMS}'..."
@@ -75,7 +78,8 @@ EM.run do
     # update redis for each matched char
     status.emojis().each do |matched_emoji|
       cp = matched_emoji.unified
-      db.evalsha(sha, [], [cp, status.tiny_json()])
+      # db.evalsha(sha, [], [cp, status.tiny_json])
+      db.update([], [cp, status.tiny_json()])
     end
   end
 
