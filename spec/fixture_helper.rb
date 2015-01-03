@@ -1,8 +1,7 @@
 require 'twitter'
-require 'oj'
 
 def load_fixture(id)
-  Oj.default_options={symbol_keys: true}
-  f = Twitter::Tweet.new( Oj.load_file "./spec/fixtures/#{id}.json" )
+  j = JSON.parse(File.read("./spec/fixtures/#{id}.json"), symbolize_names: true)
+  f = Twitter::Tweet.new( j )
   f.extend(WrappedTweet)
 end

@@ -1,26 +1,17 @@
 source 'https://rubygems.org'
 ruby '2.2.0'
+# ruby '1.9.3', :engine => 'jruby', :engine_version => '1.7.16'
 
-group :web, :feeder, :streamer do
-  gem 'redis', '~> 3.0.7'
-  gem 'hiredis', '~> 0.5.2'
-  gem 'oj', '~> 2.9.9'
-end
-
-group :web, :feeder do
-  gem 'emoji_data', '~> 0.2.0'
-end
-
-group :feeder do
-  gem 'tweetstream', '~> 2.6.1'
-  gem 'twitter', '5.8.0' #manually set!
-  gem 'colored', '~> 1.2'
-end
+gem 'twitter',    '~> 5.13.0'
+gem 'redis',      '~> 3.2.0'
+#TODO: jrjackson for fast json in jruby?? twitter gem wont like it...
+gem 'emoji_data', '~> 0.2.0'
+gem 'colored',    '~> 1.2'
 
 group :development do
   gem 'rspec', '~> 3.1.0'
   gem 'benchmark-ips', '~> 2.1.0'
-  gem 'stackprof'
+  gem 'stackprof', :platforms => :mri
 end
 
 group :production do

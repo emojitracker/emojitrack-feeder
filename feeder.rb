@@ -1,11 +1,10 @@
 #!/usr/bin/env ruby
 require_relative 'lib/config'
-require_relative 'lib/wrapped_tweet'
-require_relative 'lib/kiosk_interaction'
+require_relative 'lib/monitor'
+require_relative 'lib/tweet_processor'
+
 require 'emoji_data'
-require 'oj'
 require 'colored'
-require 'eventmachine'
 
 # preamble
 puts "...starting in verbose mode!" if VERBOSE
@@ -41,109 +40,75 @@ else
   TERMS = EmojiData.chars({include_variants: true})
 end
 
-#track references to us too (in kiosk mode)
-TERMS << '@emojitracker' if KioskInteraction.enabled?
 
 # if we are actively profiling for performance, load and start the profiler
+# TODO: replace me with something that works in jruby
 if is_development? && PROFILE
   puts "Starting profiling run, profile will be logged upon termination."
   require 'stackprof'
   StackProf.start()
 end
 
-EventMachine.run do
-  # load scripts to Redis server
-  # We push most of the logic of updating Redis into a Lua script.
-  # For details of the why see the script itself.
-  #
-  # Don't forget to save the SHA so we can refer to them later via EVALSHA.
-  sha = REDIS.script(:load, IO.read("./scripts/update.lua"))
-
-  # initialize streaming counts
-  puts "Setting up a stream to track #{TERMS.size} terms '#{TERMS}'..."
-  @tracked,@skipped,@tracked_last,@skipped_last = 0,0,0,0
-  @client = TweetStream::Client.new
-
-  # main event loops for matched tweets
-  @client.track(TERMS) do |status|
-    @tracked += 1
-
-    # extend the tweet object with our convenience mixins
-    status.extend(WrappedTweet)
-
-    # disregard retweets
-    next if status.retweet?
-
-    # for interactive kiosk mode at #emojishow !
-    # allow users to request a specific character for display
-    # send the interaction notice but DONT LOG THE TWEET since its artificial
-    if KioskInteraction.enabled?
-      if status.text.start_with?("@emojitracker")
-        KioskInteraction::InteractionRequest.new(status).handle() if status.emojis.length > 0
-        next # halt further tweet processing
-      end
-    end
-
-    # update redis for each matched char
-    status.emojis.each do |matched_emoji|
-      cp = matched_emoji.unified
-      REDIS.evalsha(sha, [], [cp, status.tiny_json])
+# Trap TERM signals sent to PID, for anything we want to do upon shutdown.
+#
+# For now, this is just used to stop the profiler if running, but could be
+# for anything clever to make things more graceful ala:
+# http://robares.com/2010/09/26/safe-shutdown-of-eventmachine-reactors/
+trap("TERM") do
+  if is_development? && PROFILE
+    StackProf.stop()
+    File.open('stackprof-feeder-cpu.dump', 'wb') do |f|
+      f.write Marshal.dump(StackProf.results)
     end
   end
-
-  # Error handling for Twitter streams.
-  @client.on_error do |message|
-    puts "ERROR: #{message}"
-  end
-  @client.on_enhance_your_calm do
-    puts "TWITTER SAYZ ENHANCE UR CALM"
-  end
-  @client.on_limit do |skip_count|
-    @skipped = skip_count
-    puts "RATE LIMITED LOL"
-  end
-  @client.on_stall_warning do |warning|
-    puts "STALL FALLBEHIND WARNING - NOT KEEPING UP WITH STREAM"
-    puts warning
-  end
-
-  # Periodic logging to console/graphite - stream track status.
-  @stats_refresh_rate = 10
-  EM::PeriodicTimer.new(@stats_refresh_rate) do
-    period = @tracked-@tracked_last
-    period_rate = period / @stats_refresh_rate
-
-    puts "Terms tracked: #{@tracked} (\u2191#{period}" +
-         ", +#{period_rate}/sec.), rate limited: #{@skipped}" +
-         " (+#{@skipped - @skipped_last})"
-    graphite_log('feeder.updates.rate_per_second', period_rate)
-    @tracked_last = @tracked
-    @skipped_last = @skipped
-  end
-
-  # Periodic logging to console/graphite - redis DB status.
-  @redis_check_refresh_rate = 60
-  EM::PeriodicTimer.new(@redis_check_refresh_rate) do
-    info = REDIS.info
-    puts "REDIS - used memory: #{info['used_memory_human']}" +
-         ", iops: #{info['instantaneous_ops_per_sec']}"
-    graphite_log('feeder.redis.used_memory_kb', info['used_memory'].to_i / 1024)
-    graphite_log('feeder.redis.iops', info['instantaneous_ops_per_sec'])
-  end
-
-  # Trap TERM signals sent to PID, for anything we want to do upon shutdown.
-  #
-  # For now, this is just used to stop the profiler if running, but could be
-  # for anything clever to make things more graceful ala:
-  # http://robares.com/2010/09/26/safe-shutdown-of-eventmachine-reactors/
-  trap("TERM") do
-    if is_development? && PROFILE
-      StackProf.stop()
-      File.open('stackprof-feeder-cpu.dump', 'wb') do |f|
-        f.write Marshal.dump(StackProf.results)
-      end
-    end
-    EM.stop
-  end
-
+  # EM.stop
 end
+
+#Periodic logging to console/graphite - stream track status.
+StreamMonitor.start!
+
+# set up a queue and workers to process it
+require 'thread'
+Thread.abort_on_exception=true # we want to see all errors for now
+
+queue = Queue.new
+numworkers = 4 #TODO: set dynamically
+workers = []
+(1..numworkers).each do |n|
+  workers << TweetProcessor.start!(queue, n)
+end
+
+# initialize streaming counts
+puts "Setting up a stream to track #{TERMS.size} terms '#{TERMS}'..."
+$tracked,$skipped = 0,0
+# main event loops for matched tweets
+@client.filter(track: TERMS.join(",")) do |status|
+  case status
+  when Twitter::Tweet
+    $tracked += 1
+    queue << status
+  when Twitter::Streaming::Message
+    warn "GOT A STREAMING MSG: #{status}"
+  when Twitter::Streaming::StallWarning
+    warn "STALL WARNING - FALLING BEHIND STREAM"
+  end
+end
+
+# Error handling for Twitter streams.
+# TODO: need to figure out how to get enhance your calm and skip limits from
+# twitter gem...
+
+# @client.on_error do |message|
+#   puts "ERROR: #{message}"
+# end
+# @client.on_enhance_your_calm do
+#   puts "TWITTER SAYZ ENHANCE UR CALM"
+# end
+# @client.on_limit do |skip_count|
+#   @skipped = skip_count
+#   puts "RATE LIMITED LOL"
+# end
+# @client.on_stall_warning do |warning|
+#   puts "STALL FALLBEHIND WARNING - NOT KEEPING UP WITH STREAM"
+#   puts warning
+# end

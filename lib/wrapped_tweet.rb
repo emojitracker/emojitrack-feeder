@@ -4,7 +4,6 @@
 # handles common methods for dealing with tweet status we get from tweetstream
 ################################################
 require 'emoji_data'
-require 'oj'
 require 'time'
 
 module WrappedTweet
@@ -41,7 +40,7 @@ module WrappedTweet
 
   # memoized cache of ensmallenified json
   def tiny_json
-    @small_json ||= Oj.dump(self.ensmallen)
+    @small_json ||= JSON.fast_generate(self.ensmallen)
   end
 
   # return all the emoji chars contained in the tweet
