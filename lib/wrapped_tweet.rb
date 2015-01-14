@@ -41,20 +41,20 @@ module WrappedTweet
 
   # memoized cache of ensmallenified json
   def tiny_json
-    @small_json ||= Oj.dump(self.ensmallen)
+    Oj.dump(self.ensmallen)
   end
 
   # return all the emoji chars contained in the tweet, as EmojiData::EmojiChar
   # dedupe since we only want to count each emoji once per tweet
   def emojis
-    @emojis ||= EmojiData.find_by_str(self.text).uniq { |e| e.unified }
+    EmojiData.find_by_str(self.text).uniq { |e| e.unified }
   end
 
   protected
   # twitter seems to have a bug where usernames can get null bytes set in string
   # this strips them out so we dont cause string parse errors
   def safe_user_name
-    @safe_name ||= self.user.name.gsub(/\0/, '')
+    self.user.name.gsub(/\0/, '')
   end
 
   def html_link(text, url)
