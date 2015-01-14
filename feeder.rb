@@ -77,9 +77,7 @@ EM.run do
 
     # update redis for each matched char
     status.emojis().each do |matched_emoji|
-      cp = matched_emoji.unified
-      # db.evalsha(sha, [], [cp, status.tiny_json])
-      db.update([], [cp, status.tiny_json()])
+      db.update([], [matched_emoji.unified, status.tiny_json()])
     end
   end
 
