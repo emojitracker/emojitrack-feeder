@@ -13,12 +13,12 @@ module WrappedTweet
   # (what? it's a perfectly cromulent word.)
   def ensmallen
     {
-      'id'                  => self.id.to_s,
+      'id'                  => self.attrs[:id_str],
       'text'                => self.text,
       'screen_name'         => self.user.screen_name,
       'name'                => self.safe_user_name(),
       'links'               => self.ensmallen_links(),
-      'profile_image_url'   => self.user.profile_image_url.to_s,
+      'profile_image_url'   => self.user.attrs[:profile_image_url],
       'created_at'          => self.created_at.iso8601
     }
   end
@@ -28,9 +28,9 @@ module WrappedTweet
   def ensmallen_links
     links = (self.urls + self.media).map do |link|
       {
-        'url'          => link.url.to_s,
-        'display_url'  => link.display_url.to_s,
-        'expanded_url' => link.expanded_url.to_s,
+        'url'          => link.attrs[:url],
+        'display_url'  => link.attrs[:display_url],
+        'expanded_url' => link.attrs[:expanded_url],
         'indices'      => link.indices
       }
     end
