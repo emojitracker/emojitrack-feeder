@@ -24,10 +24,10 @@ This is but a small part of emojitracker's infrastructure.  Major components of 
 - **[emojitrack-web](//github.com/mroth/emojitrack)** _the web frontend and application server (you are here!)_
 - **[emojitrack-feeder](//github.com/mroth/emojitrack-feeder)** _consumes the Twitter Streaming API and feeds our data pipeline_
 - **emojitrack-streamer** _handles streaming updates to clients via SSE_
-* [ruby version](//github.com/mroth/emojitrack-streamer) (deprecated)
-* [nodejs version](//github.com/mroth/emojitrack-nodestreamer)
-* [go version](//github.com/mroth/emojitrack-gostreamer) (currently used in production)
-* [streamer API spec](//github.com/mroth/emojitrack-streamer-spec) _defines the streamer spec, tests servers in staging_
+  * [ruby version](//github.com/mroth/emojitrack-streamer) (deprecated)
+  * [nodejs version](//github.com/mroth/emojitrack-nodestreamer)
+  * [go version](//github.com/mroth/emojitrack-gostreamer) (currently used in production)
+  * [streamer API spec](//github.com/mroth/emojitrack-streamer-spec) _defines the streamer spec, tests servers in staging_
 
 
 Additionally, many of the libraries emojitrack uses have also been carved out into independent emoji-related open-source projects, see the following:
