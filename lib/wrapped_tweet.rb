@@ -44,13 +44,6 @@ module WrappedTweet
     @small_json ||= Oj.dump(self.ensmallen)
   end
 
-  # return all the emoji chars contained in the tweet
-  # TODO: deprecate and remove me, dont appear to be using anywhere and  will
-  # probably having unexpected behavior with the variant encoding change.
-  def emoji_chars
-    @emoji_chars ||= self.emojis.map { |e| e.char }
-  end
-
   # return all the emoji chars contained in the tweet, as EmojiData::EmojiChar
   # dedupe since we only want to count each emoji once per tweet
   def emojis
