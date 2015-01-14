@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 require_relative 'lib/config'
 require_relative 'lib/wrapped_tweet'
-require_relative 'lib/kiosk_interaction'
 require 'emoji_data'
 require 'oj'
 require 'colored'
@@ -41,9 +40,6 @@ else
   TERMS = EmojiData.chars({include_variants: true})
 end
 
-#track references to us too (in kiosk mode)
-TERMS << '@emojitracker' if KioskInteraction.enabled?
-
 # if we are actively profiling for performance, load and start the profiler
 if is_development? && PROFILE
   puts "Starting profiling run, profile will be logged upon termination."
@@ -73,16 +69,6 @@ EventMachine.run do
 
     # disregard retweets
     next if status.retweet?
-
-    # for interactive kiosk mode at #emojishow !
-    # allow users to request a specific character for display
-    # send the interaction notice but DONT LOG THE TWEET since its artificial
-    if KioskInteraction.enabled?
-      if status.text.start_with?("@emojitracker")
-        KioskInteraction::InteractionRequest.new(status).handle() if status.emojis.length > 0
-        next # halt further tweet processing
-      end
-    end
 
     # update redis for each matched char
     status.emojis().each do |matched_emoji|
