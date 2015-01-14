@@ -85,9 +85,9 @@ EventMachine.run do
     end
 
     # update redis for each matched char
-    status.emojis.each do |matched_emoji|
+    status.emojis().each do |matched_emoji|
       cp = matched_emoji.unified
-      REDIS.evalsha(sha, [], [cp, status.tiny_json])
+      REDIS.evalsha(sha, [], [cp, status.tiny_json()])
     end
   end
 
