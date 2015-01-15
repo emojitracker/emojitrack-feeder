@@ -36,8 +36,10 @@ class TweetProcessor
 
       # update redis for each matched char
       status.emojis.each do |matched_emoji|
-        cp = matched_emoji.unified
-        @redis_client.evalsha(redis_update_script, [], [cp, status.tiny_json])
+        @redis_client.evalsha(
+          redis_update_script,
+          [], [matched_emoji.unified, status.tiny_json()]
+        )
       end
     end
   end

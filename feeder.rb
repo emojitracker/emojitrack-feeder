@@ -40,7 +40,6 @@ else
   TERMS = EmojiData.chars({include_variants: true})
 end
 
-
 # if we are actively profiling for performance, load and start the profiler
 # TODO: replace me with something that works in jruby
 if is_development? && PROFILE
