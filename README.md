@@ -21,13 +21,13 @@ Note, **DO NOT** run the feeder process with REDIS_URL configured to the product
 ## Other parts of emojitracker
 This is but a small part of emojitracker's infrastructure.  Major components of the project include:
 
-- **[emojitrack-web](//github.com/mroth/emojitrack)** _the web frontend and application server (you are here!)_
+- **[emojitrack-web](//github.com/mroth/emojitrack)** _the web frontend and application server_
 - **[emojitrack-feeder](//github.com/mroth/emojitrack-feeder)** _consumes the Twitter Streaming API and feeds our data pipeline_
 - **emojitrack-streamer** _handles streaming updates to clients via SSE_
   * [ruby version](//github.com/mroth/emojitrack-streamer) (deprecated)
-  * [nodejs version](//github.com/mroth/emojitrack-nodestreamer)
-  * [go version](//github.com/mroth/emojitrack-gostreamer) (currently used in production)
-  * [streamer API spec](//github.com/mroth/emojitrack-streamer-spec) _defines the streamer spec, tests servers in staging_
+  * [nodejs version](//github.com/mroth/emojitrack-nodestreamer)(deprecated)
+  * [go version](//github.com/mroth/emojitrack-gostreamer) (production)
+  * [streamer API spec](//github.com/mroth/emojitrack-streamer-spec) _defines the streamer spec & tests servers in staging_
 
 
 Additionally, many of the libraries emojitrack uses have also been carved out into independent emoji-related open-source projects, see the following:
