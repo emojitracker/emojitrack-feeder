@@ -23,7 +23,7 @@ GEM
       simple_oauth (~> 0.2)
     emoji_data (0.2.0)
     equalizer (0.0.9)
-    eventmachine (1.0.4)
+    eventmachine (1.0.8)
     faraday (0.9.0)
       multipart-post (>= 1.2, < 3)
     hiredis (0.5.2)
@@ -87,3 +87,6 @@ DEPENDENCIES
   stackprof
   tweetstream (~> 2.6.1)
   twitter (= 5.8.0)
+
+BUNDLED WITH
+   1.10.6
