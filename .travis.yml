@@ -4,3 +4,7 @@ rvm:
 
 bundler_args: --without production
 cache: bundler
+
+# run benchmark suite on successful builds, so we have perf history
+after_success:
+  - bundle exec rake bench
