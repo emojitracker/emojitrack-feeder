@@ -1,8 +1,6 @@
 language: ruby
 rvm:
   - 2.2.3
-
-bundler_args: --without production
 cache: bundler
 
 # run benchmark suite on successful builds, so we have perf history
