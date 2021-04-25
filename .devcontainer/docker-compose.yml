@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+    feeder:
+        build:
+            context: ..
+            dockerfile: .devcontainer/Dockerfile
+            args:
+                VARIANT: "2.7"
+                INSTALL_NODE: "false"
+        environment:
+            REDIS_URL: redis://db
+        volumes:
+            - ..:/workspaces/emojitrack-feeder
+        user: vscode
+        command: sleep infinity
+
+    db:
+        image: "redis:alpine"
+        restart: unless-stopped
+        ports:
+            - 6379:6379
