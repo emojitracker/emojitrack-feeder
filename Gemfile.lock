@@ -30,14 +30,14 @@ GEM
     http (0.5.1)
       http_parser.rb
     http_parser.rb (0.6.0)
-    json (1.8.3)
+    json (1.8.6)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
     multi_json (1.11.2)
     multipart-post (2.0.0)
     naught (1.1.0)
     newrelic_rpm (3.13.2.302)
-    oj (2.9.9)
+    oj (2.18.5)
     rake (10.4.2)
     redis (3.0.7)
     rspec (3.1.0)
@@ -82,7 +82,7 @@ DEPENDENCIES
   emoji_data (~> 0.2.0)
   hiredis (~> 0.6.0)
   newrelic_rpm
-  oj (~> 2.9.9)
+  oj (~> 2.18.5)
   rake
   redis (~> 3.0.7)
   rspec (~> 3.1.0)
@@ -90,5 +90,8 @@ DEPENDENCIES
   tweetstream (~> 2.6.1)
   twitter (= 5.8.0)
 
+RUBY VERSION
+   ruby 2.7.3p183
+
 BUNDLED WITH
-   1.10.6
+   2.1.4
