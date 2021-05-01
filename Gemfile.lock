@@ -38,7 +38,7 @@ GEM
     naught (1.1.0)
     newrelic_rpm (3.13.2.302)
     oj (2.18.5)
-    rake (10.4.2)
+    rake (12.3.3)
     redis (3.0.7)
     rspec (3.1.0)
       rspec-core (~> 3.1.0)
