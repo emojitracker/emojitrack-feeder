@@ -8,6 +8,9 @@ GEM
     cookiejar (0.3.2)
     daemons (1.2.3)
     diff-lcs (1.2.5)
+    em-hiredis (0.3.0)
+      eventmachine (~> 1.0)
+      hiredis (~> 0.5.0)
     em-http-request (1.1.2)
       addressable (>= 2.3.4)
       cookiejar
@@ -79,6 +82,7 @@ PLATFORMS
 DEPENDENCIES
   benchmark-ips (~> 2.1.0)
   colored (~> 1.2)
+  em-hiredis
   emoji_data (~> 0.2.0)
   hiredis (~> 0.6.0)
   newrelic_rpm

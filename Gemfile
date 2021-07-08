@@ -9,6 +9,7 @@ group :feeder do
   gem 'tweetstream', '~> 2.6.1'
   gem 'twitter', '5.8.0' #manually set!
   gem 'colored', '~> 1.2'
+  gem 'em-hiredis'
 end
 
 group :development do
