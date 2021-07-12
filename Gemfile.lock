@@ -1,7 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.3.8)
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
     benchmark-ips (2.1.1)
     buftok (0.2.0)
     colored (1.2)
@@ -38,6 +39,7 @@ GEM
     naught (1.1.0)
     newrelic_rpm (3.13.2.302)
     oj (2.18.5)
+    public_suffix (4.0.6)
     rake (10.4.2)
     redis (3.0.7)
     rspec (3.1.0)
